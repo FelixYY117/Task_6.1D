@@ -5,59 +5,61 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-import okhttp3.OkHttpClient;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Random;
 
-public class Quiz_initial extends AppCompatActivity {
-    private String Username;
+public class QuizInitial extends AppCompatActivity {
+    private String username;
     private String description;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_initial);
 
+        TextView usernameTextView = findViewById(R.id.textusername);
+        ImageButton startButton = findViewById(R.id.buttonContinue);
+        TextView descriptionTextView = findViewById(R.id.testtaskDescription);
 
+        // Get username from intent
         Intent intent = getIntent();
         if (intent != null) {
-            Username = intent.getStringExtra("username");
+            username = intent.getStringExtra("username");
         }
 
-        TextView username = findViewById(R.id.textusername);
-        ImageButton start = findViewById(R.id.buttonContinue);
-        TextView Description = findViewById(R.id.testtaskDescription);
+        // Set username text
+        usernameTextView.setText(username);
 
-        //get interest
+        // Get interests from database
         DBHelper dbHelper = new DBHelper(this);
-        List<String> Interests = dbHelper.getUserInterests(Username);
+        List<String> interests = dbHelper.getUserInterests(username);
 
-//        int index = (int) (Math.random() * Interests.size());
-//        description = Interests.get(index);
-        if (Interests.isEmpty()) {
-            // 处理空列表的情况,例如使用默认主题或提示用户添加兴趣
-            description = "AI";
+        // Set description text
+        if (interests.isEmpty()) {
+            // Handle empty interests list, e.g., use a default topic or prompt user to add interests
+            description = "AI"; // Default topic
         } else {
-            //随机一个作为测验
-            int index = (int) (Math.random() * Interests.size());
-            description = Interests.get(index);
+            // Randomly select an interest as the quiz topic
+            int index = new Random().nextInt(interests.size());
+            description = interests.get(index);
         }
-        username.setText(Username);
-        Description.setText(String.format("Click the following button to get into the quiz of %s", description));
+        descriptionTextView.setText(String.format("Click the following button to get into the quiz of %s", description));
 
-        //启动OnClickListener
-        start.setOnClickListener(new View.OnClickListener() {
+        // Start button onClickListener
+        startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //启动test页面
-                Intent intent = new Intent(Quiz_initial.this, Quiz.class);
-                intent.putExtra("description", description);
-                startActivity(intent);
+                // Start Quiz activity
+                startQuiz();
             }
-
         });
     }
+
+    private void startQuiz() {
+        Intent intent = new Intent(QuizInitial.this, Quiz.class);
+        intent.putExtra("description", description);
+        startActivity(intent);
+    }
 }
+
