@@ -12,5 +12,6 @@ public class QuizResponse {
 
     public void setQuiz(List<Question> quiz) {
         this.quiz = quiz;
+        
     }
 }
